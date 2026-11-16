@@ -18,14 +18,9 @@ class PvPLogSettings
 	// when the victim was hit by a player within this many seconds. 0 = off.
 	int KillAttributionWindowSec = 60;
 
-	// Discord webhooks ("" = off). Kills and hits can go to different channels.
+	// Discord webhook for kills ("" = off). Hits are only written to the log files.
 	string DiscordKillsWebhook = "";
-	string DiscordHitsWebhook = "";
 	string DiscordUsername = "PvP Log";
-
-	// in-game notifications to admins with the VPP permissions PvPLog:KillAlerts / PvPLog:HitAlerts
-	bool VPPKillAlerts = true;
-	bool VPPHitAlerts = false;
 
 	// how many recent events the /pvplog chat command can show
 	int HistorySize = 50;

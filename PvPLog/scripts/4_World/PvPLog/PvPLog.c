@@ -21,7 +21,7 @@ class PvPLogPendingKill
 	- OnHit: every hit a player takes from another player (directly, by grenade / trap they armed, or by the car they drive).
 	- OnKilled: the death is finished a moment later (DEATH_DELAY_MS), so the fatal hit's zone and ammo are known
 	  whatever order the engine calls EEKilled and EEHitBy in.
-	Output: text + JSONL files, Discord webhooks, VPP admin notifications, /pvplog history.
+	Output: text + JSONL files (hits and kills), Discord webhook (kills only), /pvplog history.
 */
 class PvPLog
 {
@@ -145,22 +145,6 @@ class PvPLog
 
 		string shortText = hit.m_AttackerName + " попал в " + victimName + " | " + hit.m_WeaponName + " | " + PvPLogUtils.ZoneLabel(zone) + " | " + PvPLogFmt.F1(distance) + " м";
 		AddHistory("[" + time.Substring(11, 8) + "] " + shortText);
-
-		if (m_Settings.DiscordHitsWebhook != "")
-		{
-			string fields = PvPLogDiscord.Field("Оружие", hit.m_WeaponName + " (" + hit.m_Weapon + ")");
-			fields += "," + PvPLogDiscord.Field("Патрон", ammo);
-			fields += "," + PvPLogDiscord.Field("Куда", PvPLogUtils.ZoneLabel(zone));
-			fields += "," + PvPLogDiscord.Field("Урон", PvPLogFmt.F1(damage) + " HP (осталось " + PvPLogFmt.F1(healthLeft) + ")");
-			fields += "," + PvPLogDiscord.Field("Дистанция", PvPLogFmt.F1(distance) + " м");
-			fields += "," + PvPLogDiscord.Field("Способ", PvPLogUtils.MethodLabel(hit.m_Method));
-			fields += "," + PvPLogDiscord.Field("Атакующий", hit.m_AttackerName + "\n" + hit.m_AttackerId + "\n" + PvPLogFmt.Pos(hit.m_AttackerPos), false);
-			fields += "," + PvPLogDiscord.Field("Цель", victimName + "\n" + victimId + "\n" + PvPLogFmt.Pos(victimPos), false);
-			m_Discord.Enqueue(m_Settings.DiscordHitsWebhook, Embed("Попадание", "**" + hit.m_AttackerName + "** → **" + victimName + "**", 15105570, fields));
-		}
-
-		if (m_Settings.VPPHitAlerts)
-			PvPLogVPP.NotifyAdmins(PvPLogVPP.PERM_HIT_ALERTS, "PvP: попадание", shortText);
 	}
 
 	// ---------------------------------------------------------------- deaths
@@ -302,9 +286,6 @@ class PvPLog
 			fields += "," + PvPLogDiscord.Field("Жертва", kill.m_VictimName + "\n" + kill.m_VictimId + "\nКоординаты: " + PvPLogFmt.Pos(kill.m_VictimPos), false);
 			m_Discord.Enqueue(m_Settings.DiscordKillsWebhook, Embed("Убийство", "**" + kill.m_KillerName + "** убил **" + kill.m_VictimName + "**", 15158332, fields));
 		}
-
-		if (m_Settings.VPPKillAlerts)
-			PvPLogVPP.NotifyAdmins(PvPLogVPP.PERM_KILL_ALERTS, "PvP: убийство", shortText);
 	}
 
 	// ---------------------------------------------------------------- output

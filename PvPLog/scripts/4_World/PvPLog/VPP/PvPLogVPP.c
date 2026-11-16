@@ -1,42 +1,11 @@
 /*
 	VPPAdminTools integration:
-	- permissions (they appear in the VPP admin menu, Permissions tab, after the first start):
-		PvPLog:KillAlerts   - in-game notification on every PvP kill
-		PvPLog:HitAlerts    - in-game notification on every PvP hit (noisy; also needs VPPHitAlerts in settings.json)
-		PvPLog:ChatHistory  - chat command /pvplog [count]
+	- permission PvPLog:ChatHistory (VPP admin menu, Permissions tab) for the chat command /pvplog [count]
 	- grenade / trap activators come from VPP (Grenade_Base / TrapBase GetActivator).
 */
 class PvPLogVPP
 {
-	const static string PERM_KILL_ALERTS = "PvPLog:KillAlerts";
-	const static string PERM_HIT_ALERTS = "PvPLog:HitAlerts";
 	const static string PERM_CHAT = "PvPLog:ChatHistory";
-
-	static void NotifyAdmins(string permission, string title, string text)
-	{
-		PermissionManager permissions = GetPermissionManager();
-		if (!permissions)
-			return;
-
-		array<Man> players = new array<Man>();
-		GetGame().GetPlayers(players);
-		foreach (Man man : players)
-		{
-			PlayerIdentity identity = man.GetIdentity();
-			if (!identity)
-				continue;
-
-			string steamId = identity.GetPlainId();
-			// regular players: skip before VerifyPermission, which logs every rejection
-			if (!permissions.HasUserGroup(steamId) && !permissions.IsSuperAdmin(steamId))
-				continue;
-
-			if (!permissions.VerifyPermission(steamId, permission, "", false))
-				continue;
-
-			NotificationSystem.SendNotificationToPlayerIdentityExtended(identity, 10.0, title, text, "set:ccgui_enforce image:MapUserMarker");
-		}
-	}
 
 	// private line in the player's chat
 	static void SendChat(PlayerBase player, string text)
@@ -53,7 +22,6 @@ modded class ChatCommandManager
 	override void OnInit()
 	{
 		super.OnInit();
-		GetPermissionManager().AddPermissionType({PvPLogVPP.PERM_KILL_ALERTS, PvPLogVPP.PERM_HIT_ALERTS});
 		// the ChatCommand constructor registers PERM_CHAT itself
 		AddChatCommand(new PvPLogChatModule("/pvplog", 0, PvPLogVPP.PERM_CHAT));
 	}
