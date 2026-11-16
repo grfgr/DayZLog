@@ -1,19 +1,19 @@
 class PvPLogPendingKill
 {
-	PlayerBase Victim;
-	string VictimName;
-	string VictimId;
-	vector VictimPos;
+	PlayerBase m_Victim;
+	string m_VictimName;
+	string m_VictimId;
+	vector m_VictimPos;
 
-	PlayerBase Killer;
-	string KillerName;
-	string KillerId;
-	vector KillerPos;
-	string Weapon;
-	string WeaponName;
-	string Method;
+	PlayerBase m_Killer;
+	string m_KillerName;
+	string m_KillerId;
+	vector m_KillerPos;
+	string m_Weapon;
+	string m_WeaponName;
+	string m_Method;
 
-	int Time;
+	int m_Time;
 };
 
 /*
@@ -77,20 +77,20 @@ class PvPLog
 			return;
 
 		PvPLogAttacker attacker = PvPLogUtils.ResolveAttacker(source, damageType);
-		if (!attacker || attacker.Player == victim)
+		if (!attacker || attacker.m_Player == victim)
 			return;
 
 		PvPLogHitInfo hit = new PvPLogHitInfo();
-		hit.Attacker = attacker.Player;
-		hit.AttackerName = PvPLogUtils.NameOf(attacker.Player);
-		hit.AttackerId = PvPLogUtils.IdOf(attacker.Player);
-		hit.AttackerPos = attacker.Player.GetPosition();
-		hit.Weapon = attacker.Weapon;
-		hit.WeaponName = attacker.WeaponName;
-		hit.Ammo = ammo;
-		hit.Zone = zone;
-		hit.Method = attacker.Method;
-		hit.Time = GetGame().GetTime();
+		hit.m_Attacker = attacker.m_Player;
+		hit.m_AttackerName = PvPLogUtils.NameOf(attacker.m_Player);
+		hit.m_AttackerId = PvPLogUtils.IdOf(attacker.m_Player);
+		hit.m_AttackerPos = attacker.m_Player.GetPosition();
+		hit.m_Weapon = attacker.m_Weapon;
+		hit.m_WeaponName = attacker.m_WeaponName;
+		hit.m_Ammo = ammo;
+		hit.m_Zone = zone;
+		hit.m_Method = attacker.m_Method;
+		hit.m_Time = GetGame().GetTime();
 		victim.m_PvPLog_LastHit = hit;
 
 		if (!m_Settings.LogHits)
@@ -110,13 +110,13 @@ class PvPLog
 		string victimName = PvPLogUtils.NameOf(victim);
 		string victimId = PvPLogUtils.IdOf(victim);
 		vector victimPos = victim.GetPosition();
-		float distance = vector.Distance(hit.AttackerPos, victimPos);
+		float distance = vector.Distance(hit.m_AttackerPos, victimPos);
 		string time = PvPLogFmt.Now();
 
 		string text = "[" + time + "] HIT  | ";
-		text += hit.AttackerName + " (" + hit.AttackerId + ") [" + PvPLogFmt.Pos(hit.AttackerPos) + "]";
+		text += hit.m_AttackerName + " (" + hit.m_AttackerId + ") [" + PvPLogFmt.Pos(hit.m_AttackerPos) + "]";
 		text += " -> " + victimName + " (" + victimId + ") [" + PvPLogFmt.Pos(victimPos) + "]";
-		text += " | " + hit.WeaponName + " (" + hit.Weapon + ") | " + ammo + " | " + PvPLogUtils.MethodLabel(hit.Method);
+		text += " | " + hit.m_WeaponName + " (" + hit.m_Weapon + ") | " + ammo + " | " + PvPLogUtils.MethodLabel(hit.m_Method);
 		text += " | " + PvPLogUtils.ZoneLabel(zone);
 		text += " | урон " + PvPLogFmt.F1(damage) + " HP, кровь " + PvPLogFmt.F1(blood) + ", шок " + PvPLogFmt.F1(shock);
 		text += " | осталось " + PvPLogFmt.F1(healthLeft) + " HP | " + PvPLogFmt.F1(distance) + " м";
@@ -124,16 +124,16 @@ class PvPLog
 		PvPLogJson json = new PvPLogJson();
 		json.Str("kind", "hit");
 		json.Str("time", time);
-		json.Str("attacker", hit.AttackerName);
-		json.Str("attackerId", hit.AttackerId);
-		json.Vec("attackerPos", hit.AttackerPos);
+		json.Str("attacker", hit.m_AttackerName);
+		json.Str("attackerId", hit.m_AttackerId);
+		json.Vec("attackerPos", hit.m_AttackerPos);
 		json.Str("victim", victimName);
 		json.Str("victimId", victimId);
 		json.Vec("victimPos", victimPos);
-		json.Str("weapon", hit.Weapon);
-		json.Str("weaponName", hit.WeaponName);
+		json.Str("weapon", hit.m_Weapon);
+		json.Str("weaponName", hit.m_WeaponName);
 		json.Str("ammo", ammo);
-		json.Str("method", hit.Method);
+		json.Str("method", hit.m_Method);
 		json.Str("zone", zone);
 		json.Num("damage", damage);
 		json.Num("blood", blood);
@@ -143,20 +143,20 @@ class PvPLog
 
 		Write(text, json.Build());
 
-		string shortText = hit.AttackerName + " попал в " + victimName + " | " + hit.WeaponName + " | " + PvPLogUtils.ZoneLabel(zone) + " | " + PvPLogFmt.F1(distance) + " м";
+		string shortText = hit.m_AttackerName + " попал в " + victimName + " | " + hit.m_WeaponName + " | " + PvPLogUtils.ZoneLabel(zone) + " | " + PvPLogFmt.F1(distance) + " м";
 		AddHistory("[" + time.Substring(11, 8) + "] " + shortText);
 
 		if (m_Settings.DiscordHitsWebhook != "")
 		{
-			string fields = PvPLogDiscord.Field("Оружие", hit.WeaponName + " (" + hit.Weapon + ")");
+			string fields = PvPLogDiscord.Field("Оружие", hit.m_WeaponName + " (" + hit.m_Weapon + ")");
 			fields += "," + PvPLogDiscord.Field("Патрон", ammo);
 			fields += "," + PvPLogDiscord.Field("Куда", PvPLogUtils.ZoneLabel(zone));
 			fields += "," + PvPLogDiscord.Field("Урон", PvPLogFmt.F1(damage) + " HP (осталось " + PvPLogFmt.F1(healthLeft) + ")");
 			fields += "," + PvPLogDiscord.Field("Дистанция", PvPLogFmt.F1(distance) + " м");
-			fields += "," + PvPLogDiscord.Field("Способ", PvPLogUtils.MethodLabel(hit.Method));
-			fields += "," + PvPLogDiscord.Field("Атакующий", hit.AttackerName + "\n" + hit.AttackerId + "\n" + PvPLogFmt.Pos(hit.AttackerPos), false);
+			fields += "," + PvPLogDiscord.Field("Способ", PvPLogUtils.MethodLabel(hit.m_Method));
+			fields += "," + PvPLogDiscord.Field("Атакующий", hit.m_AttackerName + "\n" + hit.m_AttackerId + "\n" + PvPLogFmt.Pos(hit.m_AttackerPos), false);
 			fields += "," + PvPLogDiscord.Field("Цель", victimName + "\n" + victimId + "\n" + PvPLogFmt.Pos(victimPos), false);
-			m_Discord.Enqueue(m_Settings.DiscordHitsWebhook, Embed("Попадание", "**" + hit.AttackerName + "** → **" + victimName + "**", 15105570, fields));
+			m_Discord.Enqueue(m_Settings.DiscordHitsWebhook, Embed("Попадание", "**" + hit.m_AttackerName + "** → **" + victimName + "**", 15105570, fields));
 		}
 
 		if (m_Settings.VPPHitAlerts)
@@ -171,22 +171,22 @@ class PvPLog
 			return;
 
 		PvPLogPendingKill kill = new PvPLogPendingKill();
-		kill.Victim = victim;
-		kill.VictimName = PvPLogUtils.NameOf(victim);
-		kill.VictimId = PvPLogUtils.IdOf(victim);
-		kill.VictimPos = victim.GetPosition();
-		kill.Time = GetGame().GetTime();
+		kill.m_Victim = victim;
+		kill.m_VictimName = PvPLogUtils.NameOf(victim);
+		kill.m_VictimId = PvPLogUtils.IdOf(victim);
+		kill.m_VictimPos = victim.GetPosition();
+		kill.m_Time = GetGame().GetTime();
 
 		PvPLogAttacker attacker = PvPLogUtils.ResolveAttacker(EntityAI.Cast(killerObject), -1);
-		if (attacker && attacker.Player != victim)
+		if (attacker && attacker.m_Player != victim)
 		{
-			kill.Killer = attacker.Player;
-			kill.KillerName = PvPLogUtils.NameOf(attacker.Player);
-			kill.KillerId = PvPLogUtils.IdOf(attacker.Player);
-			kill.KillerPos = attacker.Player.GetPosition();
-			kill.Weapon = attacker.Weapon;
-			kill.WeaponName = attacker.WeaponName;
-			kill.Method = attacker.Method;
+			kill.m_Killer = attacker.m_Player;
+			kill.m_KillerName = PvPLogUtils.NameOf(attacker.m_Player);
+			kill.m_KillerId = PvPLogUtils.IdOf(attacker.m_Player);
+			kill.m_KillerPos = attacker.m_Player.GetPosition();
+			kill.m_Weapon = attacker.m_Weapon;
+			kill.m_WeaponName = attacker.m_WeaponName;
+			kill.m_Method = attacker.m_Method;
 		}
 
 		m_Pending.Insert(kill);
@@ -199,7 +199,7 @@ class PvPLog
 		for (int i = m_Pending.Count() - 1; i >= 0; i--)
 		{
 			PvPLogPendingKill kill = m_Pending[i];
-			if (now - kill.Time < DEATH_DELAY_MS)
+			if (now - kill.m_Time < DEATH_DELAY_MS)
 				continue;
 
 			FinishKill(kill);
@@ -213,50 +213,50 @@ class PvPLog
 	protected void FinishKill(PvPLogPendingKill kill)
 	{
 		PvPLogHitInfo lastHit = null;
-		if (kill.Victim)
+		if (kill.m_Victim)
 		{
-			kill.Victim.m_PvPLog_DeathHandled = true;
-			lastHit = kill.Victim.m_PvPLog_LastHit;
+			kill.m_Victim.m_PvPLog_DeathHandled = true;
+			lastHit = kill.m_Victim.m_PvPLog_LastHit;
 		}
 
 		bool indirect = false;
 		int secondsSinceHit = -1;
 		if (lastHit)
-			secondsSinceHit = (kill.Time - lastHit.Time) / 1000;
+			secondsSinceHit = (kill.m_Time - lastHit.m_Time) / 1000;
 
 		// no player killer (bled out, fell, ...): blame the last player who hit the victim, if recent enough
-		if (kill.KillerId == "" && kill.KillerName == "")
+		if (kill.m_KillerId == "" && kill.m_KillerName == "")
 		{
 			if (!lastHit || m_Settings.KillAttributionWindowSec <= 0 || secondsSinceHit > m_Settings.KillAttributionWindowSec)
 				return;
 
 			indirect = true;
-			kill.Killer = lastHit.Attacker;
-			kill.KillerName = lastHit.AttackerName;
-			kill.KillerId = lastHit.AttackerId;
-			kill.KillerPos = lastHit.AttackerPos;
-			if (lastHit.Attacker && lastHit.Attacker.IsAlive())
-				kill.KillerPos = lastHit.Attacker.GetPosition();
+			kill.m_Killer = lastHit.m_Attacker;
+			kill.m_KillerName = lastHit.m_AttackerName;
+			kill.m_KillerId = lastHit.m_AttackerId;
+			kill.m_KillerPos = lastHit.m_AttackerPos;
+			if (lastHit.m_Attacker && lastHit.m_Attacker.IsAlive())
+				kill.m_KillerPos = lastHit.m_Attacker.GetPosition();
 		}
 
 		// the fatal hit tells the zone and ammo; it also names the weapon better than the killer object does
 		string zone = "";
 		string ammo = "";
-		if (lastHit && lastHit.AttackerId == kill.KillerId && lastHit.AttackerName == kill.KillerName)
+		if (lastHit && lastHit.m_AttackerId == kill.m_KillerId && lastHit.m_AttackerName == kill.m_KillerName)
 		{
-			zone = lastHit.Zone;
-			ammo = lastHit.Ammo;
-			kill.Weapon = lastHit.Weapon;
-			kill.WeaponName = lastHit.WeaponName;
-			kill.Method = lastHit.Method;
+			zone = lastHit.m_Zone;
+			ammo = lastHit.m_Ammo;
+			kill.m_Weapon = lastHit.m_Weapon;
+			kill.m_WeaponName = lastHit.m_WeaponName;
+			kill.m_Method = lastHit.m_Method;
 		}
 
-		float distance = vector.Distance(kill.KillerPos, kill.VictimPos);
+		float distance = vector.Distance(kill.m_KillerPos, kill.m_VictimPos);
 		string time = PvPLogFmt.Now();
 
-		string text = "[" + time + "] KILL | Убийца: " + kill.KillerName + " (" + kill.KillerId + ") [" + PvPLogFmt.Pos(kill.KillerPos) + "]";
-		text += " | Жертва: " + kill.VictimName + " (" + kill.VictimId + ") [" + PvPLogFmt.Pos(kill.VictimPos) + "]";
-		text += " | " + kill.WeaponName + " (" + kill.Weapon + ") | " + ammo + " | " + PvPLogUtils.MethodLabel(kill.Method);
+		string text = "[" + time + "] KILL | Убийца: " + kill.m_KillerName + " (" + kill.m_KillerId + ") [" + PvPLogFmt.Pos(kill.m_KillerPos) + "]";
+		text += " | Жертва: " + kill.m_VictimName + " (" + kill.m_VictimId + ") [" + PvPLogFmt.Pos(kill.m_VictimPos) + "]";
+		text += " | " + kill.m_WeaponName + " (" + kill.m_Weapon + ") | " + ammo + " | " + PvPLogUtils.MethodLabel(kill.m_Method);
 		text += " | " + PvPLogUtils.ZoneLabel(zone) + " | " + PvPLogFmt.F1(distance) + " м";
 		if (indirect)
 			text += " | косвенно: умер через " + secondsSinceHit + " с после попадания";
@@ -264,16 +264,16 @@ class PvPLog
 		PvPLogJson json = new PvPLogJson();
 		json.Str("kind", "kill");
 		json.Str("time", time);
-		json.Str("killer", kill.KillerName);
-		json.Str("killerId", kill.KillerId);
-		json.Vec("killerPos", kill.KillerPos);
-		json.Str("victim", kill.VictimName);
-		json.Str("victimId", kill.VictimId);
-		json.Vec("victimPos", kill.VictimPos);
-		json.Str("weapon", kill.Weapon);
-		json.Str("weaponName", kill.WeaponName);
+		json.Str("killer", kill.m_KillerName);
+		json.Str("killerId", kill.m_KillerId);
+		json.Vec("killerPos", kill.m_KillerPos);
+		json.Str("victim", kill.m_VictimName);
+		json.Str("victimId", kill.m_VictimId);
+		json.Vec("victimPos", kill.m_VictimPos);
+		json.Str("weapon", kill.m_Weapon);
+		json.Str("weaponName", kill.m_WeaponName);
 		json.Str("ammo", ammo);
-		json.Str("method", kill.Method);
+		json.Str("method", kill.m_Method);
 		json.Str("zone", zone);
 		json.Num("distance", distance);
 		json.Bool("indirect", indirect);
@@ -282,7 +282,7 @@ class PvPLog
 
 		Write(text, json.Build());
 
-		string shortText = kill.KillerName + " убил " + kill.VictimName + " | " + kill.WeaponName + " | " + PvPLogUtils.ZoneLabel(zone) + " | " + PvPLogFmt.F1(distance) + " м";
+		string shortText = kill.m_KillerName + " убил " + kill.m_VictimName + " | " + kill.m_WeaponName + " | " + PvPLogUtils.ZoneLabel(zone) + " | " + PvPLogFmt.F1(distance) + " м";
 		if (indirect)
 			shortText += " (косвенно)";
 
@@ -290,17 +290,17 @@ class PvPLog
 
 		if (m_Settings.DiscordKillsWebhook != "")
 		{
-			string fields = PvPLogDiscord.Field("Оружие", kill.WeaponName + " (" + kill.Weapon + ")");
+			string fields = PvPLogDiscord.Field("Оружие", kill.m_WeaponName + " (" + kill.m_Weapon + ")");
 			fields += "," + PvPLogDiscord.Field("Патрон", ammo);
 			fields += "," + PvPLogDiscord.Field("Куда", PvPLogUtils.ZoneLabel(zone));
 			fields += "," + PvPLogDiscord.Field("Дистанция", PvPLogFmt.F1(distance) + " м");
-			fields += "," + PvPLogDiscord.Field("Способ", PvPLogUtils.MethodLabel(kill.Method));
+			fields += "," + PvPLogDiscord.Field("Способ", PvPLogUtils.MethodLabel(kill.m_Method));
 			if (indirect)
 				fields += "," + PvPLogDiscord.Field("Косвенно", "умер через " + secondsSinceHit + " с после попадания");
 
-			fields += "," + PvPLogDiscord.Field("Убийца", kill.KillerName + "\n" + kill.KillerId + "\nКоординаты: " + PvPLogFmt.Pos(kill.KillerPos), false);
-			fields += "," + PvPLogDiscord.Field("Жертва", kill.VictimName + "\n" + kill.VictimId + "\nКоординаты: " + PvPLogFmt.Pos(kill.VictimPos), false);
-			m_Discord.Enqueue(m_Settings.DiscordKillsWebhook, Embed("Убийство", "**" + kill.KillerName + "** убил **" + kill.VictimName + "**", 15158332, fields));
+			fields += "," + PvPLogDiscord.Field("Убийца", kill.m_KillerName + "\n" + kill.m_KillerId + "\nКоординаты: " + PvPLogFmt.Pos(kill.m_KillerPos), false);
+			fields += "," + PvPLogDiscord.Field("Жертва", kill.m_VictimName + "\n" + kill.m_VictimId + "\nКоординаты: " + PvPLogFmt.Pos(kill.m_VictimPos), false);
+			m_Discord.Enqueue(m_Settings.DiscordKillsWebhook, Embed("Убийство", "**" + kill.m_KillerName + "** убил **" + kill.m_VictimName + "**", 15158332, fields));
 		}
 
 		if (m_Settings.VPPKillAlerts)

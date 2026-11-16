@@ -1,25 +1,25 @@
 // Who is behind a hit: the player, what they used and how.
 class PvPLogAttacker
 {
-	PlayerBase Player;
-	string Weapon;       // class name: M4A1, KitchenKnife, M67Grenade ...
-	string WeaponName;   // display name
-	string Method;       // firearm / melee / explosion / trap / vehicle / other
+	PlayerBase m_Player;
+	string m_Weapon;       // class name: M4A1, KitchenKnife, M67Grenade ...
+	string m_WeaponName;   // display name
+	string m_Method;       // firearm / melee / explosion / trap / vehicle / other
 };
 
 // Last player hit a victim took; used for the kill (zone, ammo) and for deaths without a direct killer.
 class PvPLogHitInfo
 {
-	PlayerBase Attacker;
-	string AttackerName;
-	string AttackerId;
-	vector AttackerPos;
-	string Weapon;
-	string WeaponName;
-	string Ammo;
-	string Zone;
-	string Method;
-	int Time;            // GetGame().GetTime(), ms
+	PlayerBase m_Attacker;
+	string m_AttackerName;
+	string m_AttackerId;
+	vector m_AttackerPos;
+	string m_Weapon;
+	string m_WeaponName;
+	string m_Ammo;
+	string m_Zone;
+	string m_Method;
+	int m_Time;            // GetGame().GetTime(), ms
 };
 
 class PvPLogUtils
@@ -30,9 +30,9 @@ class PvPLogUtils
 			return null;
 
 		PvPLogAttacker attacker = new PvPLogAttacker();
-		attacker.Method = MethodOf(damageType);
-		attacker.Weapon = source.GetType();
-		attacker.WeaponName = source.GetDisplayName();
+		attacker.m_Method = MethodOf(damageType);
+		attacker.m_Weapon = source.GetType();
+		attacker.m_WeaponName = source.GetDisplayName();
 
 		PlayerBase player = PlayerBase.Cast(source);
 		Grenade_Base grenade = Grenade_Base.Cast(source);
@@ -42,43 +42,43 @@ class PvPLogUtils
 		if (player)
 		{
 			// bare hands, or a melee hit made with whatever is in hands (rifle butt etc.)
-			attacker.Player = player;
+			attacker.m_Player = player;
 			EntityAI inHands = player.GetHumanInventory().GetEntityInHands();
 			if (inHands)
 			{
-				attacker.Weapon = inHands.GetType();
-				attacker.WeaponName = inHands.GetDisplayName();
+				attacker.m_Weapon = inHands.GetType();
+				attacker.m_WeaponName = inHands.GetDisplayName();
 			}
 			else
 			{
-				attacker.Weapon = "Fists";
-				attacker.WeaponName = "Кулаки";
+				attacker.m_Weapon = "Fists";
+				attacker.m_WeaponName = "Кулаки";
 			}
 		}
 		else if (grenade)
 		{
 			// VPP remembers who pulled the pin
-			attacker.Player = grenade.GetActivator();
-			attacker.Method = "explosion";
+			attacker.m_Player = grenade.GetActivator();
+			attacker.m_Method = "explosion";
 		}
 		else if (trap)
 		{
 			// VPP remembers who set the trap / mine
-			attacker.Player = trap.GetActivator();
-			attacker.Method = "trap";
+			attacker.m_Player = trap.GetActivator();
+			attacker.m_Method = "trap";
 		}
 		else if (vehicle)
 		{
-			attacker.Player = PlayerBase.Cast(vehicle.CrewMember(0));
-			attacker.Method = "vehicle";
+			attacker.m_Player = PlayerBase.Cast(vehicle.CrewMember(0));
+			attacker.m_Method = "vehicle";
 		}
 		else
 		{
 			// weapon, knife, projectile: whoever holds it
-			attacker.Player = PlayerBase.Cast(source.GetHierarchyRootPlayer());
+			attacker.m_Player = PlayerBase.Cast(source.GetHierarchyRootPlayer());
 		}
 
-		if (!attacker.Player)
+		if (!attacker.m_Player)
 			return null;
 
 		return attacker;
