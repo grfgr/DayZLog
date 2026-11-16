@@ -126,7 +126,8 @@ class PvPLogUtils
 		if (cached != "")
 			return cached;
 
-		return "?";
+		// no player behind it: a spawned survivor dummy or an AI
+		return "Bot (" + player.GetType() + ")";
 	}
 
 	static string IdOf(PlayerBase player)
