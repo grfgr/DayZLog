@@ -33,6 +33,8 @@ class PvPLog
 	protected ref PvPLogDiscord m_Discord;
 	protected ref array<ref PvPLogPendingKill> m_Pending;
 	protected ref array<string> m_History;
+	// date of the current log files; rotation runs when it changes
+	protected string m_LogDay;
 
 	static PvPLog Get()
 	{
@@ -48,7 +50,9 @@ class PvPLog
 		m_Discord = new PvPLogDiscord(m_Settings.DiscordUsername);
 		m_Pending = new array<ref PvPLogPendingKill>();
 		m_History = new array<string>();
-		Print("[PvPLog] started, logs: " + PvPLogSettings.LOG_DIR);
+		m_LogDay = PvPLogFmt.Today();
+		PvPLogRotation.DeleteOlderThan(PvPLogSettings.LOG_DIR, m_Settings.LogRetentionDays);
+		Print("[PvPLog] started, logs: " + PvPLogSettings.LOG_DIR + ", kept for " + m_Settings.LogRetentionDays + " days");
 	}
 
 	PvPLogSettings GetSettings()
@@ -307,7 +311,14 @@ class PvPLog
 
 	protected void Write(string text, string json)
 	{
-		string baseName = PvPLogSettings.LOG_DIR + "/PvP_" + PvPLogFmt.Today();
+		string today = PvPLogFmt.Today();
+		if (today != m_LogDay)
+		{
+			m_LogDay = today;
+			PvPLogRotation.DeleteOlderThan(PvPLogSettings.LOG_DIR, m_Settings.LogRetentionDays);
+		}
+
+		string baseName = PvPLogSettings.LOG_DIR + "/" + PvPLogRotation.PREFIX + today;
 		if (m_Settings.WriteTextLog)
 			AppendLine(baseName + ".log", text);
 

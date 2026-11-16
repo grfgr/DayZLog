@@ -14,6 +14,9 @@ class PvPLogSettings
 	bool WriteTextLog = true;   // PvP_YYYY-MM-DD.log   - human readable
 	bool WriteJsonLog = true;   // PvP_YYYY-MM-DD.jsonl - one JSON object per line, for tools / parsers
 
+	// rotation: a new file every day; files older than this many days are deleted (0 = keep forever)
+	int LogRetentionDays = 14;
+
 	// A death without a player killer (bleeding out, fall, etc.) is still counted as a PvP kill
 	// when the victim was hit by a player within this many seconds. 0 = off.
 	int KillAttributionWindowSec = 60;
