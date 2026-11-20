@@ -55,7 +55,24 @@ PvPLog — серверный мод, клиенты его не загружа�
 3. Подключить через `-servermod=@PvPLog` (не через `-mod`).
 4. Настроить `profiles\PvPLog\settings.json`.
 
-## Шаблон описания (Steam BBCode)
+## Короткое описание (Steam BBCode)
+
+```
+[b]PvPLog[/b] — серверный мод логов PvP.
+
+Пишет каждое попадание и убийство: кто, кому, куда, с чего, во сколько и с какой дистанции. При убийстве — координаты убийцы и жертвы.
+
+Логи в файлы (с ротацией по дням), убийства в Discord, команда [b]/pvplog[/b] для админов VPPAdminTools.
+
+Установка: только на сервер, [b]-servermod=@PvPLog[/b]. Требуется VPPAdminTools.
+
+[hr][/hr]
+[b]PvPLog[/b] — server-side PvP logger: hits and kills with weapon, body part, distance and both players' coordinates. Log files, Discord webhook for kills, /pvplog for VPP admins. Server only: -servermod=@PvPLog. Requires VPPAdminTools.
+
+Автор / Author: ZloyDed.dll
+```
+
+## Подробное описание (Steam BBCode)
 
 ```
 [h1]PvPLog — логи PvP для сервера[/h1]
