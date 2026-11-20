@@ -17,7 +17,7 @@ class CfgMods
 		dir = "PvPLog";
 		name = "PvPLog";
 		credits = "";
-		author = "";
+		author = "ZloyDed.dll";
 		authorID = "0";
 		version = "1.0.0";
 		extra = 0;
